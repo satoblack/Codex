@@ -17,6 +17,7 @@ Kullanım seçenekleri:
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import os
 import time
@@ -400,10 +401,23 @@ def launch_torrent_panel(
 
 
 if __name__ == "__main__":
-    print("Notebook kullanımı:")
-    print("from torrent_resume_lightning import launch_torrent_panel")
-    print("launch_torrent_panel()")
-    print("veya tek dosya ile:")
-    print(
-        "launch_torrent_panel(auto_torrent_path='/teamspace/studios/this_studio/128b-Batocera.41.Mini-Honda.torrent')"
+    parser = argparse.ArgumentParser(description="Lightning.ai uyumlu torrent indirici")
+    parser.add_argument(
+        "--torrent",
+        default=None,
+        help="Eklenip otomatik başlatılacak .torrent dosya yolu",
+    )
+    parser.add_argument("--max-concurrent", type=int, default=20)
+    parser.add_argument("--checkpoint-seconds", type=int, default=5)
+    args = parser.parse_args()
+
+    default_torrent = "/teamspace/studios/this_studio/128b-Batocera.41.Mini-Honda.torrent"
+    torrent_path = args.torrent
+    if torrent_path is None and Path(default_torrent).exists():
+        torrent_path = default_torrent
+
+    launch_torrent_panel(
+        max_concurrent=args.max_concurrent,
+        checkpoint_seconds=args.checkpoint_seconds,
+        auto_torrent_path=torrent_path,
     )

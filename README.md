@@ -36,6 +36,14 @@ dl.enqueue_torrent_file("/teamspace/studios/this_studio/128b-Batocera.41.Mini-Ho
 dl.run()
 ```
 
+
+## Script olarak çalıştırma (.py)
+```bash
+python torrent_resume_lightning.py --torrent /teamspace/studios/this_studio/128b-Batocera.41.Mini-Honda.torrent
+```
+
+> `--torrent` verilmezse ve yukarıdaki varsayılan dosya mevcutsa otomatik kullanılır.
+
 ## Veri dizini
 İsterseniz veri konumunu `TORRENT_BASE_DIR` ile özelleştirebilirsiniz:
 ```python
