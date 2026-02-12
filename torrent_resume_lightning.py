@@ -85,10 +85,34 @@ def _build_session() -> "lt.session":
         "ul_rate_limit": 0,
     }
 
+    # Libtorrent binding sürümleri arasında settings API değişebiliyor.
     try:
         session.apply_settings(fast_settings)
+        return session
     except Exception:
-        session.set_settings(fast_settings)
+        pass
+
+    # Bazı sürümlerde yalnızca settings_pack + apply_settings desteklenir.
+    try:
+        pack = session.get_settings()
+        for key, value in fast_settings.items():
+            try:
+                pack[key] = value
+            except Exception:
+                # Bu binding/versiyonda olmayan anahtarları sessizce atla.
+                continue
+        session.apply_settings(pack)
+        return session
+    except Exception:
+        pass
+
+    # Çok eski/özel binding'lerde set_settings varsa son çare onu dene.
+    set_settings = getattr(session, "set_settings", None)
+    if callable(set_settings):
+        try:
+            set_settings(fast_settings)
+        except Exception:
+            pass
 
     return session
 

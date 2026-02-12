@@ -44,6 +44,10 @@ python torrent_resume_lightning.py --torrent /teamspace/studios/this_studio/128b
 
 > `--torrent` verilmezse ve yukarıdaki varsayılan dosya mevcutsa otomatik kullanılır.
 
+
+> Not: Bazı Lightning/libtorrent sürümlerinde `session.set_settings` bulunmaz. Kod bu durumda
+> `apply_settings` + `get_settings` fallback ile devam edecek şekilde uyumlu hale getirildi.
+
 ## Veri dizini
 İsterseniz veri konumunu `TORRENT_BASE_DIR` ile özelleştirebilirsiniz:
 ```python
