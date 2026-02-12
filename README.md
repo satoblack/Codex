@@ -12,19 +12,27 @@ pip install --upgrade pip setuptools wheel
 pip install libtorrent==2.0.11 ipywidgets
 ```
 
-## Lightning.ai üzerinde kullanım (Notebook / Widget panel)
+## Hızlı kullanım (senin torrent dosyan ile)
+```python
+from torrent_resume_lightning import launch_torrent_panel
+launch_torrent_panel(auto_torrent_path="/teamspace/studios/this_studio/128b-Batocera.41.Mini-Honda.torrent")
+```
+
+## Notebook / Widget panel
 ```python
 from torrent_resume_lightning import launch_torrent_panel
 launch_torrent_panel()
 ```
+
+> Eğer `ipywidgets` yoksa, `launch_torrent_panel` artık hata fırlatmak yerine konsol moduna düşer.
+> Bu modda indirme başlatmak için `auto_torrent_path` verin.
 
 ## Saf Python kullanım (widget olmadan)
 ```python
 from torrent_resume_lightning import TorrentDownloader
 
 dl = TorrentDownloader(max_concurrent=20, checkpoint_seconds=5)
-dl.enqueue_magnet("magnet:?xt=urn:btih:...")
-# veya: dl.enqueue_torrent_file("/path/to/file.torrent")
+dl.enqueue_torrent_file("/teamspace/studios/this_studio/128b-Batocera.41.Mini-Honda.torrent")
 dl.run()
 ```
 

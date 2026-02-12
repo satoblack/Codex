@@ -262,13 +262,46 @@ def _extract_uploaded_files(upload_value: Any) -> list[tuple[str, bytes]]:
     return files
 
 
-def launch_torrent_panel(max_concurrent: int = 20, checkpoint_seconds: int = 5) -> None:
-    """Lightning/Jupyter için widget tabanlı torrent panelini başlat."""
+def _run_console_mode(downloader: "TorrentDownloader") -> None:
+    """Widgets yoksa basit konsol çıktısı ile indirme çalıştır."""
 
-    if widgets is None or clear_output is None or display is None:
-        raise RuntimeError("launch_torrent_panel için ipywidgets ve IPython gerekli.")
+    def _status(elapsed: int, status: dict[str, Any]) -> None:
+        print(
+            f"\rSüre: {elapsed//3600:02d}:{(elapsed%3600)//60:02d}:{elapsed%60:02d} "
+            f"| Aktif: {status['active']} | Kuyruk: {status['queued']} "
+            f"| Hız: {status['total_speed']/1024/1024:.2f} MB/s",
+            end="",
+            flush=True,
+        )
+
+    downloader.run(status_callback=_status)
+    print("\n✅ Tüm indirmeler tamamlandı.")
+
+
+def launch_torrent_panel(
+    max_concurrent: int = 20,
+    checkpoint_seconds: int = 5,
+    auto_torrent_path: str | None = None,
+) -> None:
+    """Lightning/Jupyter için torrent panelini başlat.
+
+    - ipywidgets kuruluysa etkileşimli panel açar.
+    - ipywidgets yoksa konsol moduna düşer.
+    - `auto_torrent_path` verilirse başlangıçta kuyruğa ekler.
+    """
 
     downloader = TorrentDownloader(max_concurrent=max_concurrent, checkpoint_seconds=checkpoint_seconds)
+
+    if auto_torrent_path:
+        downloader.enqueue_torrent_file(auto_torrent_path)
+
+    if widgets is None or clear_output is None or display is None:
+        print("⚠️ ipywidgets/IPython bulunamadı, konsol modunda çalıştırılıyor.")
+        if not downloader.queue:
+            print("⚠️ Kuyruk boş. auto_torrent_path verin veya widget kurun: pip install ipywidgets")
+            return
+        _run_console_mode(downloader)
+        return
 
     magnet_input = widgets.Textarea(
         description="Magnet",
@@ -370,3 +403,7 @@ if __name__ == "__main__":
     print("Notebook kullanımı:")
     print("from torrent_resume_lightning import launch_torrent_panel")
     print("launch_torrent_panel()")
+    print("veya tek dosya ile:")
+    print(
+        "launch_torrent_panel(auto_torrent_path='/teamspace/studios/this_studio/128b-Batocera.41.Mini-Honda.torrent')"
+    )
